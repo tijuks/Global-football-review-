@@ -1,0 +1,6 @@
+{
+  "name": "Copy of  Global  Football Review Hub",
+  "description": "An application that provides AI-generated reviews for various football leagues including EPL, French league 1,2,La Liga, Serie A, B, C, Bundesliga, and other notable leagues using Gemini API.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
