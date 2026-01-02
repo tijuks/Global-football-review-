@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MatchInfo, AnalysisType } from '../types';
 import * as geminiService from '../services/geminiService';
 import LoadingSpinner from './LoadingSpinner';
@@ -19,6 +20,7 @@ interface AnalysisContent {
 }
 
 const MatchAnalysisModal: React.FC<MatchAnalysisModalProps> = ({ match, onClose, onPlayerClick }) => {
+  const { t } = useTranslation();
   const initialTab: AnalysisType = match.isFuture ? 'pre-match' : 'post-match';
   const [activeTab, setActiveTab] = useState<AnalysisType>(initialTab);
   const [analysisContent, setAnalysisContent] = useState<Record<AnalysisType, AnalysisContent>>({
@@ -146,9 +148,9 @@ const MatchAnalysisModal: React.FC<MatchAnalysisModalProps> = ({ match, onClose,
         
         <div className="px-6 border-b-2 border-gray-700">
             <nav className="flex space-x-1" aria-label="Analysis Tabs">
-                <AnalysisTab tabType="pre-match" label="Pre-Match" />
-                <AnalysisTab tabType="halftime" label="Halftime" />
-                <AnalysisTab tabType="post-match" label="Post-Match" />
+                <AnalysisTab tabType="pre-match" label={t('match.pre_match')} />
+                <AnalysisTab tabType="halftime" label={t('match.halftime')} />
+                <AnalysisTab tabType="post-match" label={t('match.post_match')} />
             </nav>
         </div>
         

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ComparisonTrayProps {
   players: string[];
@@ -9,6 +10,7 @@ interface ComparisonTrayProps {
 }
 
 const ComparisonTray: React.FC<ComparisonTrayProps> = ({ players, onRemove, onCompare, onClear }) => {
+  const { t } = useTranslation();
   if (players.length === 0) return null;
 
   return (
@@ -33,8 +35,8 @@ const ComparisonTray: React.FC<ComparisonTrayProps> = ({ players, onRemove, onCo
         </div>
         
         <div className="flex flex-col">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{players.length} Selected</span>
-          <span className="text-sm font-semibold text-white">Player Comparison</span>
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{players.length} {t('player.selected')}</span>
+          <span className="text-sm font-semibold text-white">{t('head_to_head')}</span>
         </div>
 
         <div className="flex gap-2 ml-auto">
@@ -42,7 +44,7 @@ const ComparisonTray: React.FC<ComparisonTrayProps> = ({ players, onRemove, onCo
             onClick={onClear}
             className="px-3 py-1.5 text-xs font-semibold text-gray-400 hover:text-white transition-colors"
           >
-            Clear
+            {t('player.clear')}
           </button>
           <button 
             onClick={onCompare}
@@ -54,7 +56,7 @@ const ComparisonTray: React.FC<ComparisonTrayProps> = ({ players, onRemove, onCo
                 : 'bg-gray-700 text-gray-500 cursor-not-allowed'}
             `}
           >
-            Compare Now
+            {t('player.compare_now')}
           </button>
         </div>
       </div>

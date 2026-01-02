@@ -1,23 +1,31 @@
 
-
 import { League, Nation, TabDefinition, RealtimeCategory } from './types';
 
 export const APP_TITLE = "Global Football Review Hub";
 
-export const GEMINI_MODEL_NAME = 'gemini-2.5-flash';
+export const GEMINI_MODEL_NAME = 'gemini-3-flash-preview';
 
 export const LEAGUES: League[] = [
-  { id: 'epl', name: 'Premier League', promptFocus: 'the English Premier League (EPL)', type: 'league' },
-  { id: 'laliga', name: 'La Liga', promptFocus: 'Spain\'s La Liga', type: 'league' },
-  { id: 'serie_a', name: 'Serie A', promptFocus: 'Italy\'s Serie A', type: 'league' },
-  { id: 'serie_b', name: 'Serie B', promptFocus: 'Italy\'s Serie B', type: 'league' },
-  { id: 'serie_c', name: 'Serie C', promptFocus: 'Italy\'s Serie C (Lega Pro)', type: 'league' },
-  { id: 'bundesliga', name: 'Bundesliga', promptFocus: 'Germany\'s Bundesliga', type: 'league' },
+  { id: 'epl', name: 'Premier League', promptFocus: 'the English Premier League (EPL)', type: 'league', confederation: 'UEFA', isPopular: true },
+  { id: 'laliga', name: 'La Liga', promptFocus: 'Spain\'s La Liga', type: 'league', confederation: 'UEFA', isPopular: true },
+  { id: 'serie_a', name: 'Serie A', promptFocus: 'Italy\'s Serie A', type: 'league', confederation: 'UEFA', isPopular: true },
+  { id: 'bundesliga', name: 'Bundesliga', promptFocus: 'Germany\'s Bundesliga', type: 'league', confederation: 'UEFA', isPopular: true },
+  { id: 'ligue1', name: 'Ligue 1', promptFocus: 'France\'s Ligue 1', type: 'league', confederation: 'UEFA', isPopular: true },
+  { id: 'eredivisie', name: 'Eredivisie', promptFocus: 'the Dutch Eredivisie', type: 'league', confederation: 'UEFA', isPopular: false },
+  { id: 'primeira_liga', name: 'Primeira Liga', promptFocus: 'Portugal\'s Primeira Liga', type: 'league', confederation: 'UEFA', isPopular: false },
+  { id: 'mls', name: 'Major League Soccer', promptFocus: 'the American MLS', type: 'league', confederation: 'CONCACAF', isPopular: true },
+  { id: 'brasileirao', name: 'Brasileirão', promptFocus: 'Brazil\'s Serie A (Brasileirão)', type: 'league', confederation: 'CONMEBOL', isPopular: true },
+  { id: 'arg_primera', name: 'Argentine Primera', promptFocus: 'Argentine Primera División', type: 'league', confederation: 'CONMEBOL', isPopular: false },
+  { id: 'saudi_pro', name: 'Saudi Pro League', promptFocus: 'Saudi Pro League', type: 'league', confederation: 'AFC', isPopular: true },
+  { id: 'j_league', name: 'J1 League', promptFocus: 'Japan\'s J1 League', type: 'league', confederation: 'AFC', isPopular: false },
+  { id: 'serie_b', name: 'Serie B', promptFocus: 'Italy\'s Serie B', type: 'league', confederation: 'UEFA', isPopular: false },
+  { id: 'serie_c', name: 'Serie C', promptFocus: 'Italy\'s Serie C (Lega Pro)', type: 'league', confederation: 'UEFA', isPopular: false },
   { 
     id: 'others', 
     name: 'Other Leagues', 
-    promptFocus: 'other notable football leagues globally (e.g., Ligue 1, Eredivisie, MLS, Brasileirão, Argentine Primera División), focusing on major talking points or standout teams/players. Provide a combined summary.',
+    promptFocus: 'other notable football leagues globally, focusing on major talking points or standout teams/players.',
     type: 'league',
+    isPopular: false
   },
 ];
 
@@ -88,6 +96,7 @@ export const TABS: TabDefinition[] = [
   { id: 'highlights', label: 'Highlights' },
   { id: 'insights', label: 'Insights' },
   { id: 'tactics', label: 'Tactics' },
+  { id: 'predictions', label: 'Predictions' },
   { id: 'performance', label: 'Performance Data' },
   { id: 'betting', label: 'Betting Strategy' },
 ];

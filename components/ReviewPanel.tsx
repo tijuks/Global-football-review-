@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { SelectableEntity, TabId, MatchInfo, RealtimeMatch } from '../types';
+import { useTranslation } from 'react-i18next';
+import { SelectableEntity, TabId, MatchInfo, RealtimeMatch, GroundingSource } from '../types';
 import { TABS } from '../constants';
 import * as geminiService from '../services/geminiService';
 import LoadingSpinner from './LoadingSpinner';
@@ -13,6 +15,7 @@ import PerformanceDataDisplay from './PerformanceDataDisplay';
 import BettingStrategyDisplay from './BettingStrategyDisplay';
 import InteractiveText from './InteractiveText';
 import TacticsDisplay from './TacticsDisplay';
+import PredictionsDisplay from './PredictionsDisplay';
 import NationDatabase from './NationDatabase';
 import { ViewMode } from '../types';
 import MatchAnalysisModal from './MatchAnalysisModal';
@@ -22,6 +25,7 @@ interface ReviewPanelProps {
   entity: SelectableEntity | null;
   review: string | null;
   realtimeMatches: RealtimeMatch[] | null;
+  groundingSources?: GroundingSource[];
   isLoadingReview: boolean;
   errorReview: string | null;
   viewMode: ViewMode;
@@ -39,10 +43,27 @@ type AllTabsState = {
   [key in TabId]?: TabContentState;
 };
 
-const ReviewPanel: React.FC<ReviewPanelProps> = ({ entity, review, realtimeMatches, isLoadingReview, errorReview, viewMode, onSelectEntity, onPlayerClick }) => {
+const ReviewPanel: React.FC<ReviewPanelProps> = ({ 
+  entity, 
+  review, 
+  realtimeMatches, 
+  groundingSources,
+  isLoadingReview, 
+  errorReview, 
+  viewMode, 
+  onSelectEntity, 
+  onPlayerClick 
+}) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>('review');
   const [tabsContent, setTabsContent] = useState<AllTabsState>({});
   const [analyzingMatch, setAnalyzingMatch] = useState<MatchInfo | null>(null);
+
+  // Define localized tabs inside the component to respond to language changes
+  const localizedTabs = TABS.map(tab => ({
+    ...tab,
+    label: t(`tabs.${tab.id}`)
+  }));
 
   useEffect(() => {
     setActiveTab('review');
@@ -100,6 +121,10 @@ const ReviewPanel: React.FC<ReviewPanelProps> = ({ entity, review, realtimeMatch
         fetchFunction = () => geminiService.fetchTacticalFormation(entity.promptFocus);
         promptFunction = null;
         break;
+      case 'predictions':
+        fetchFunction = geminiService.fetchPredictions;
+        promptFunction = geminiService.generatePredictionsPrompt;
+        break;
       default:
         return;
     }
@@ -121,14 +146,26 @@ const ReviewPanel: React.FC<ReviewPanelProps> = ({ entity, review, realtimeMatch
   }, [activeTab, entity, loadTabData]);
 
   const renderRealtimeContent = () => {
-    if (isLoadingReview) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
+    if (isLoadingReview) return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <LoadingSpinner />
+        <p className="text-sm text-gray-500 animate-pulse">Searching Google for live match data...</p>
+      </div>
+    );
     if (errorReview) return <div className="mt-8"><ErrorMessage message={errorReview} /></div>;
     if (realtimeMatches && entity) {
-      return <RealtimeMatchesDisplay matches={realtimeMatches} title={entity.name} onAnalyzeMatch={handleOpenAnalysisModal} />;
+      return (
+        <RealtimeMatchesDisplay 
+          matches={realtimeMatches} 
+          sources={groundingSources}
+          title={entity.name} 
+          onAnalyzeMatch={handleOpenAnalysisModal} 
+        />
+      );
     }
     return (
         <div className="text-center mt-20">
-          <h2 className="text-3xl font-semibold text-gray-300 mb-4">Real-time Football Data</h2>
+          <h2 className="text-3xl font-semibold text-gray-300 mb-4">{t('match_center')}</h2>
           <p className="text-xl text-gray-400">Select a category from the sidebar to view matches.</p>
         </div>
     );
@@ -144,8 +181,8 @@ const ReviewPanel: React.FC<ReviewPanelProps> = ({ entity, review, realtimeMatch
       }
       return (
         <div className="text-center mt-20">
-          <h2 className="text-3xl font-semibold text-gray-300 mb-4">Welcome to the Football Review Hub!</h2>
-          <p className="text-xl text-gray-400">Select a league or nation from the sidebar to get started.</p>
+          <h2 className="text-3xl font-semibold text-gray-300 mb-4">{t('welcome_title')}</h2>
+          <p className="text-xl text-gray-400">{t('welcome_subtitle')}</p>
         </div>
       );
     }
@@ -164,7 +201,7 @@ const ReviewPanel: React.FC<ReviewPanelProps> = ({ entity, review, realtimeMatch
             <article className="bg-gray-800 p-6 sm:p-8 rounded-xl shadow-2xl">
                 <div className="flex items-center mb-6">
                 <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-500">
-                    {entity.name} Review
+                    {entity.name} {t('tabs.review')}
                 </h2>
                 </div>
                 <div className="prose prose-lg prose-invert max-w-none text-gray-300 leading-relaxed">
@@ -181,6 +218,7 @@ const ReviewPanel: React.FC<ReviewPanelProps> = ({ entity, review, realtimeMatch
       case 'performance':
       case 'betting':
       case 'tactics':
+      case 'predictions':
          if (tabState?.isLoading) return <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>;
          if (tabState?.error) return <div className="mt-8"><ErrorMessage message={tabState.error} /></div>;
          
@@ -192,6 +230,7 @@ const ReviewPanel: React.FC<ReviewPanelProps> = ({ entity, review, realtimeMatch
             case 'performance': return <PerformanceDataDisplay content={tabState?.data} leagueName={entity.name} />;
             case 'betting': return <BettingStrategyDisplay content={tabState?.data} leagueName={entity.name} />;
             case 'tactics': return <TacticsDisplay tacticalData={tabState?.data} leagueName={entity.name} />;
+            case 'predictions': return <PredictionsDisplay predictions={tabState?.data} entityName={entity.name} />;
          }
          return null;
 
@@ -204,7 +243,7 @@ const ReviewPanel: React.FC<ReviewPanelProps> = ({ entity, review, realtimeMatch
     <main className="flex-1 p-6 overflow-y-auto bg-gray-800/30 backdrop-blur-md flex flex-col">
       {entity && entity.type !== 'realtime' && (
         <div className="mb-6">
-          <Tabs tabs={TABS} activeTab={activeTab} onSelectTab={setActiveTab} />
+          <Tabs tabs={localizedTabs} activeTab={activeTab} onSelectTab={setActiveTab} />
         </div>
       )}
       <div className="max-w-4xl mx-auto w-full flex-grow">

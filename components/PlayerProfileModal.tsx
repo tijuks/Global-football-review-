@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SelectableEntity, PlayerProfile } from '../types';
 import * as geminiService from '../services/geminiService';
 import LoadingSpinner from './LoadingSpinner';
@@ -14,6 +15,7 @@ interface PlayerProfileModalProps {
 }
 
 const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, entity, onClose, onAddToCompare, isInComparison }) => {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,19 +91,19 @@ const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, ent
                   {isInComparison ? (
                     <>
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                      Queued
+                      {t('player.queued')}
                     </>
                   ) : (
                     <>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
-                      Compare
+                      {t('player.compare')}
                     </>
                   )}
                 </button>
               </div>
               
               <div className="mt-6">
-                  <h3 className="text-xl font-semibold text-gray-200 mb-2">Key Strengths</h3>
+                  <h3 className="text-xl font-semibold text-gray-200 mb-2">{t('player.key_strengths')}</h3>
                   <div className="flex flex-wrap gap-2">
                       {profile.strengths.map((strength, index) => (
                           <span key={index} className="bg-gray-700 text-emerald-300 text-sm font-medium px-3 py-1 rounded-full border border-white/5">{strength}</span>
@@ -110,7 +112,7 @@ const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, ent
               </div>
 
               <div className="mt-6">
-                  <h3 className="text-xl font-semibold text-gray-200 mb-2">Recent Performance</h3>
+                  <h3 className="text-xl font-semibold text-gray-200 mb-2">{t('player.recent_performance')}</h3>
                   <p className="text-gray-300 leading-relaxed bg-gray-900/40 p-4 rounded-xl border border-white/5">{profile.recentPerformance}</p>
               </div>
           </div>

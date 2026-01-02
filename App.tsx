@@ -6,13 +6,15 @@ import ReviewPanel from './components/ReviewPanel';
 import PlayerProfileModal from './components/PlayerProfileModal';
 import ComparisonTray from './components/ComparisonTray';
 import ComparisonModal from './components/ComparisonModal';
-import { SelectableEntity, ViewMode, RealtimeMatch } from './types';
+import { SelectableEntity, ViewMode, RealtimeMatch, GroundingSource } from './types';
 import * as geminiService from './services/geminiService';
+import { fetchGroundedRealtimeData } from './services/realtimeDatabase';
 
 const App: React.FC = () => {
   const [selectedEntity, setSelectedEntity] = useState<SelectableEntity | null>(null);
   const [review, setReview] = useState<string | null>(null);
   const [realtimeMatches, setRealtimeMatches] = useState<RealtimeMatch[] | null>(null);
+  const [groundingSources, setGroundingSources] = useState<GroundingSource[]>([]);
   const [isLoadingReview, setIsLoadingReview] = useState<boolean>(false);
   const [errorReview, setErrorReview] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('leagues');
@@ -28,6 +30,7 @@ const App: React.FC = () => {
     setSelectedEntity(entity);
     setReview(null); 
     setRealtimeMatches(null);
+    setGroundingSources([]);
     setErrorReview(null);
   }, []);
 
@@ -71,12 +74,13 @@ const App: React.FC = () => {
         const fetchMatches = async () => {
             setReview(null);
             setRealtimeMatches(null);
+            setGroundingSources([]);
             try {
-                const prompt = geminiService.generateRealtimeMatchesPrompt(selectedEntity.promptFocus);
-                const matches = await geminiService.fetchRealtimeMatches(prompt);
-                setRealtimeMatches(matches);
+                const data = await fetchGroundedRealtimeData(selectedEntity.promptFocus);
+                setRealtimeMatches(data.matches);
+                setGroundingSources(data.sources);
             } catch (err) {
-                 setErrorReview(err instanceof Error ? err.message : 'An unknown error occurred while fetching matches.');
+                 setErrorReview(err instanceof Error ? err.message : 'An unexpected error occurred while fetching live data.');
             } finally {
                 setIsLoadingReview(false);
             }
@@ -86,6 +90,7 @@ const App: React.FC = () => {
          const fetchEntityReview = async () => {
             setRealtimeMatches(null);
             setReview(null); 
+            setGroundingSources([]);
             try {
               const prompt = geminiService.generateLeagueReviewPrompt(selectedEntity.promptFocus);
               const reviewText = await geminiService.fetchReview(prompt);
@@ -102,6 +107,7 @@ const App: React.FC = () => {
     } else {
       setReview(null);
       setRealtimeMatches(null);
+      setGroundingSources([]);
       setErrorReview(null);
       setIsLoadingReview(false);
     }
@@ -121,6 +127,7 @@ const App: React.FC = () => {
           entity={selectedEntity} 
           review={review}
           realtimeMatches={realtimeMatches} 
+          groundingSources={groundingSources}
           isLoadingReview={isLoadingReview} 
           errorReview={errorReview} 
           viewMode={viewMode}

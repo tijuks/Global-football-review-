@@ -4,6 +4,8 @@ export interface League {
   name: string;
   promptFocus: string;
   type: 'league';
+  confederation?: Confederation;
+  isPopular?: boolean;
 }
 
 export type Confederation = 'UEFA' | 'CONMEBOL' | 'CONCACAF' | 'CAF' | 'AFC' | 'OFC';
@@ -28,7 +30,7 @@ export type SelectableEntity = League | Nation | RealtimeCategory;
 
 export type ContentData = string | null;
 
-export type TabId = 'review' | 'fixtures' | 'calendar' | 'highlights' | 'insights' | 'performance' | 'betting' | 'tactics';
+export type TabId = 'review' | 'fixtures' | 'calendar' | 'highlights' | 'insights' | 'performance' | 'betting' | 'tactics' | 'predictions';
 
 export interface TabDefinition {
   id: TabId;
@@ -68,6 +70,15 @@ export interface Fixture {
     time?: string;
 }
 
+export interface Prediction {
+  homeTeam: string;
+  awayTeam: string;
+  predictedOutcome: 'Home Win' | 'Draw' | 'Away Win';
+  confidenceScore: number;
+  reasoning: string;
+  suggestedScore?: string;
+}
+
 export type ViewMode = 'leagues' | 'nations' | 'realtime';
 
 export type FixtureInfo = string;
@@ -103,6 +114,11 @@ export interface MatchInfo {
 
 export type AnalysisType = 'pre-match' | 'halftime' | 'post-match';
 
+export interface GroundingSource {
+  title: string;
+  uri: string;
+}
+
 export interface RealtimeMatch {
   homeTeam: string;
   awayTeam: string;
@@ -110,6 +126,11 @@ export interface RealtimeMatch {
   status: 'FT' | 'HT' | 'Live' | 'Scheduled' | 'Postponed' | 'Cancelled';
   time?: string;
   competition: string;
+}
+
+export interface GroundedMatchData {
+  matches: RealtimeMatch[];
+  sources: GroundingSource[];
 }
 
 export interface BeforeInstallPromptEvent extends Event {

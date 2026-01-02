@@ -1,7 +1,8 @@
 
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import { GEMINI_MODEL_NAME } from '../constants';
-import { PlayerProfile, TacticalData, Fixture, BettingInfo, MatchInfo, RealtimeMatch, PlayerComparisonData } from '../types';
+import { PlayerProfile, TacticalData, Fixture, BettingInfo, MatchInfo, RealtimeMatch, PlayerComparisonData, Prediction } from '../types';
+import i18n from 'i18next';
 
 const API_KEY = process.env.API_KEY;
 
@@ -11,14 +12,24 @@ if (!API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: API_KEY || "MISSING_API_KEY" });
 
+const getCurrentLanguage = () => {
+  const lng = i18n.language || 'en';
+  const names: Record<string, string> = { 'en': 'English', 'es': 'Spanish', 'fr': 'French' };
+  return names[lng.split('-')[0]] || 'English';
+};
+
 const generateContentInternal = async (prompt: string, config?: any): Promise<string> => {
   if (!API_KEY) {
-    return Promise.reject(new Error("Gemini API Key is not configured. Please ensure the API_KEY environment variable is set."));
+    return Promise.reject(new Error("Gemini API Key is not configured."));
   }
+  
+  // Inject language instruction into every prompt
+  const localizedPrompt = `${prompt}\n\nIMPORTANT: Please provide the entire response in ${getCurrentLanguage()}.`;
+
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: GEMINI_MODEL_NAME,
-        contents: prompt,
+        model: 'gemini-2.0-flash-exp',
+        contents: localizedPrompt,
         config,
     });
     
@@ -29,7 +40,7 @@ const generateContentInternal = async (prompt: string, config?: any): Promise<st
     return text;
   } catch (error) {
     console.error("Error fetching content from Gemini API:", error);
-    throw new Error(`An unexpected error occurred with the Gemini API. Please try again later.`);
+    throw new Error(`An unexpected error occurred with the Gemini API.`);
   }
 };
 
@@ -96,6 +107,23 @@ export const fetchPlayerProfile = async (playerName: string, leagueContext: stri
     }
 };
 
+export const fetchPlayerSuggestions = async (query: string): Promise<string[]> => {
+    const prompt = `Generate a JSON array of up to 5 popular current football player names that start with or closely match "${query}". Provide only the array of strings.`;
+    const schema = {
+        type: Type.ARRAY,
+        items: { type: Type.STRING }
+    };
+    try {
+        const jsonString = await generateContentInternal(prompt, { 
+            responseMimeType: "application/json",
+            responseSchema: schema
+        });
+        return JSON.parse(jsonString.trim()) as string[];
+    } catch (e) {
+        return [];
+    }
+};
+
 export const fetchPlayerComparison = async (playerNames: string[], context: string): Promise<PlayerComparisonData> => {
     const prompt = `
         Compare the following players: ${playerNames.join(', ')} in the context of ${context}.
@@ -146,6 +174,43 @@ export const fetchTacticalFormation = async (leagueFocus: string): Promise<Tacti
     } catch (e) {
         throw new Error("Could not parse tactical data.");
     }
+};
+
+export const generatePredictionsPrompt = (entityFocus: string): string => {
+  return `Generate outcome predictions for 3-5 major upcoming matches in ${entityFocus}.
+    Return a JSON array of objects. Each object MUST include:
+    "homeTeam", "awayTeam", "predictedOutcome" (must be "Home Win", "Draw", or "Away Win"),
+    "confidenceScore" (an integer from 0 to 100), "reasoning" (a brief 1-2 sentence explanation),
+    and "suggestedScore" (e.g., "2-1").`;
+};
+
+export const fetchPredictions = async (prompt: string): Promise<Prediction[]> => {
+  const schema = {
+    type: Type.ARRAY,
+    items: {
+      type: Type.OBJECT,
+      properties: {
+        homeTeam: { type: Type.STRING },
+        awayTeam: { type: Type.STRING },
+        predictedOutcome: { type: Type.STRING },
+        confidenceScore: { type: Type.INTEGER },
+        reasoning: { type: Type.STRING },
+        suggestedScore: { type: Type.STRING },
+      },
+      required: ["homeTeam", "awayTeam", "predictedOutcome", "confidenceScore", "reasoning"],
+    },
+  };
+
+  const jsonString = await generateContentInternal(prompt, { 
+    responseMimeType: "application/json",
+    responseSchema: schema
+  });
+  
+  try {
+    return JSON.parse(jsonString.trim()) as Prediction[];
+  } catch (e) {
+    throw new Error("Could not parse prediction data.");
+  }
 };
 
 export const generateRealtimeMatchesPrompt = (focus: string): string => {
