@@ -1,4 +1,4 @@
-s#enable webpack: NodeJS with Webpack 
+#enable webpack: NodeJS with Webpack 
 
 on:
   push:
