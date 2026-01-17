@@ -2,17 +2,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GroundedMatchData, GroundingSource, RealtimeMatch } from "../types";
 
-const API_KEY = process.env.API_KEY;
-const ai = new GoogleGenAI({ apiKey: API_KEY || "" });
+// Always initialize using process.env.API_KEY directly in the named parameter object.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 /**
  * Service Database Helper for fetching Real-time Grounded data.
  */
 export const fetchGroundedRealtimeData = async (focus: string): Promise<GroundedMatchData> => {
-  if (!API_KEY) {
-    throw new Error("API Key is missing. Cannot fetch real-time data.");
-  }
-
   const prompt = `Search for actual current football match information for: ${focus}. 
     Provide a list of matches with home team, away team, current score (if live or finished), status (Live, HT, FT, or Scheduled), match time/date, and competition name.
     Focus on major global leagues and international tournaments.
@@ -48,7 +44,7 @@ export const fetchGroundedRealtimeData = async (focus: string): Promise<Grounded
     }
   });
 
-  // Extract sources from grounding chunks as per instructions
+  // Extract website URLs from grounding chunks as mandated for Google Search tool usage.
   const sources: GroundingSource[] = [];
   const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
   
@@ -63,11 +59,13 @@ export const fetchGroundedRealtimeData = async (focus: string): Promise<Grounded
     });
   }
 
-  // Deduplicate sources
+  // Deduplicate sources to provide a clean list.
   const uniqueSources = Array.from(new Map(sources.map(s => [s.uri, s])).values());
 
   try {
-    const data = JSON.parse(response.text || "{}");
+    // Correct usage of .text property (not a method) on GenerateContentResponse.
+    const textContent = response.text || "{}";
+    const data = JSON.parse(textContent);
     return {
       matches: data.matches || [],
       sources: uniqueSources

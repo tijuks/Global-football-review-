@@ -4,13 +4,8 @@ import { GEMINI_MODEL_NAME } from '../constants';
 import { PlayerProfile, TacticalData, Fixture, BettingInfo, MatchInfo, RealtimeMatch, PlayerComparisonData, Prediction } from '../types';
 import i18n from 'i18next';
 
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  console.warn("API_KEY environment variable not set. Gemini API calls will fail.");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY || "MISSING_API_KEY" });
+// Fix initialization to use process.env.API_KEY directly as per guidelines
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 const getCurrentLanguage = () => {
   const lng = i18n.language || 'en';
@@ -19,20 +14,17 @@ const getCurrentLanguage = () => {
 };
 
 const generateContentInternal = async (prompt: string, config?: any): Promise<string> => {
-  if (!API_KEY) {
-    return Promise.reject(new Error("Gemini API Key is not configured."));
-  }
-  
   // Inject language instruction into every prompt
   const localizedPrompt = `${prompt}\n\nIMPORTANT: Please provide the entire response in ${getCurrentLanguage()}.`;
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
-        contents: localizedPrompt,
+        model: GEMINI_MODEL_NAME,
+        contents: { parts: [{ text: localizedPrompt }] },
         config,
     });
     
+    // Access response.text directly (not as a method)
     const text = response.text;
     if (!text || text.trim() === "") {
         return "No information could be generated at this time.";

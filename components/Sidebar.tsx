@@ -202,9 +202,8 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedEntity, onSelectEntity, viewM
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
                   placeholder={`Filter ${viewMode}...`}
-                  className="w-full bg-black/40 border border-white/5 rounded-lg py-1.5 pl-8 pr-3 text-[10px] text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                  className="w-full bg-black/40 border border-white/5 rounded-lg py-1.5 px-3 text-[10px] text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                 />
-                <svg className="absolute left-2.5 top-2 h-3.5 w-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               </div>
             </section>
           )}

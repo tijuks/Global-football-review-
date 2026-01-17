@@ -133,6 +133,7 @@ export interface GroundedMatchData {
   sources: GroundingSource[];
 }
 
+// Fixed missing export for BeforeInstallPromptEvent to resolve build error in InstallButton.tsx
 export interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
@@ -140,10 +141,4 @@ export interface BeforeInstallPromptEvent extends Event {
     platform: string;
   }>;
   prompt(): Promise<void>;
-}
-
-declare global {
-  interface WindowEventMap {
-    beforeinstallprompt: BeforeInstallPromptEvent;
-  }
 }
