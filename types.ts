@@ -142,6 +142,8 @@ export interface PlayerProfile {
     club: string;
     position: string;
     strengths: string[];
+    weaknesses: string[];
+    biography: string;
     recentPerformance: string;
     careerHistory?: CareerEntry[];
 }

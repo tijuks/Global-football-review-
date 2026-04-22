@@ -24,6 +24,7 @@ export const LEAGUES: League[] = [
   { id: 'tur_super_lig', name: '🇹🇷 Süper Lig 🇹🇷', promptFocus: 'the Turkish Süper Lig', type: 'league', confederation: 'UEFA', isPopular: true, description: "Turkey's premier league, famous for its incredibly passionate fans, intense Istanbul derbies, and historic clubs like Galatasaray, Fenerbahçe, and Beşiktaş." },
   { id: 'col_primera', name: '🇨🇴 Primera A 🇨🇴', promptFocus: 'Colombia\'s Categoría Primera A', type: 'league', confederation: 'CONMEBOL', isPopular: true, description: "Colombia's top flight, known for its physical play, technical flair, and producing gifted players for global markets, led by giants like Atlético Nacional and Millonarios." },
   { id: 'ecu_serie_a', name: '🇪🇨 Serie A 🇪🇨', promptFocus: 'the Ecuadorian Serie A', type: 'league', confederation: 'CONMEBOL', isPopular: true, description: "Ecuador's premier competition, featuring high-altitude matches and rising continental powers like Independiente del Valle and LDU Quito." },
+  { id: 'rsl', name: '🇸🇦 Riyadh Soccer League ⚽', promptFocus: 'the Riyadh Soccer League (RSL)', type: 'league', confederation: 'AFC', isPopular: false, description: "The Riyadh Soccer League, a growing competition in Saudi Arabia." },
   { 
     id: 'others', 
     name: '🌍 Global Leagues 🌎', 

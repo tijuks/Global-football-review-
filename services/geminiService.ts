@@ -267,7 +267,7 @@ export const fetchBettingInfo = async (prompt: string): Promise<BettingInfo> => 
 
 export const fetchPlayerProfile = async (playerName: string, leagueContext: string): Promise<PlayerProfile> => {
     const prompt = `Provide player profile for ${playerName} in ${leagueContext}. 
-    Include: name, club, position, strengths[], recentPerformance, and a detailed careerHistory array.
+    Include: name, club, position, strengths[], weaknesses[], biography (early life, career beginnings, and significant personal details), recentPerformance, and a detailed careerHistory array.
     Each careerHistory entry should have: club, years (e.g. "2018-2022"), appearances (number), goals (number), assists (number), and achievements (array of strings).
     Return as JSON.`;
     
@@ -278,6 +278,8 @@ export const fetchPlayerProfile = async (playerName: string, leagueContext: stri
             club: { type: Type.STRING },
             position: { type: Type.STRING },
             strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+            weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
+            biography: { type: Type.STRING },
             recentPerformance: { type: Type.STRING },
             careerHistory: {
                 type: Type.ARRAY,
@@ -295,7 +297,7 @@ export const fetchPlayerProfile = async (playerName: string, leagueContext: stri
                 }
             }
         },
-        required: ["name", "club", "position", "strengths", "recentPerformance", "careerHistory"]
+        required: ["name", "club", "position", "strengths", "weaknesses", "biography", "recentPerformance", "careerHistory"]
     };
 
     const jsonString = await generateContentInternal(prompt, { 

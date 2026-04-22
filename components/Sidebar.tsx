@@ -6,6 +6,8 @@ import { SelectableEntity, ViewMode, Confederation, League, Nation } from '../ty
 import { LEAGUES, NATIONS, REALTIME_CATEGORIES } from '../constants';
 import { TeamLogo } from './TeamLogo';
 
+import { SupportModal } from './SupportModal';
+
 interface SidebarProps {
   selectedEntity: SelectableEntity | null;
   onSelectEntity: (entity: SelectableEntity) => void;
@@ -19,6 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedEntity, onSelectEntity, viewM
   const [confederationFilter, setConfederationFilter] = useState<Confederation | 'All'>('All');
   const [onlyPopular, setOnlyPopular] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
 
   const handleViewChange = (mode: ViewMode) => {
     if (viewMode !== mode) {
@@ -105,7 +108,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedEntity, onSelectEntity, viewM
           {entity.type === 'realtime' ? (
             <span className="text-sm">{getEntityEmoji()}</span>
           ) : (
-            <TeamLogo teamName={entity.name} className="w-5 h-5 rounded-full object-cover" />
+            <TeamLogo 
+                teamName={entity.name} 
+                className="w-5 h-5 rounded-full object-cover" 
+                fallback={<span className="text-sm">{getEntityEmoji()}</span>}
+            />
           )}
           <span className="truncate">{entity.name}</span>
         </div>
@@ -239,12 +246,19 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedEntity, onSelectEntity, viewM
       </div>
 
       <div className="p-4 bg-chocolate-dark border-t border-chocolate w-72">
+        <button
+          onClick={() => setIsSupportModalOpen(true)}
+          className="w-full bg-pitch-green hover:bg-pitch-green-light text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all mb-3"
+        >
+          Support the Project
+        </button>
         <div className="bg-pitch-green/5 rounded-xl p-3 border border-pitch-green/10 text-center">
           <p className="text-[9px] text-pitch-green-light font-black uppercase tracking-widest">
             Powered by Gemini 3 Flash
           </p>
         </div>
       </div>
+      <SupportModal isOpen={isSupportModalOpen} onClose={() => setIsSupportModalOpen(false)} />
     </motion.aside>
   );
 };

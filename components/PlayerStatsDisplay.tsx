@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { PlayerStatsData, PlayerStat } from '../types';
+import { PlayerStatsData } from '../types';
+import { SortableStatTable } from './SortableStatTable';
 
 interface PlayerStatsDisplayProps {
   stats: PlayerStatsData | null;
@@ -12,35 +13,6 @@ const PlayerStatsDisplay: React.FC<PlayerStatsDisplayProps> = ({ stats, entityNa
     return <p className="text-gray-400 italic">No statistics available for {entityName}.</p>;
   }
 
-  const renderStatTable = (title: string, data: PlayerStat[], icon: string, metric: keyof PlayerStat) => (
-    <div className="bg-gray-800/50 rounded-2xl border border-white/5 overflow-hidden">
-      <div className="p-4 bg-gray-700/30 border-b border-white/5 flex items-center gap-2">
-        <span className="text-xl">{icon}</span>
-        <h4 className="text-sm font-black uppercase tracking-widest text-pitch-green-light">{title}</h4>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs">
-          <thead>
-            <tr className="text-gray-500 border-b border-white/5">
-              <th className="p-3 font-black uppercase tracking-tighter">Player</th>
-              <th className="p-3 font-black uppercase tracking-tighter">Team</th>
-              <th className="p-3 font-black uppercase tracking-tighter text-right">{String(metric)}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {data.map((player, idx) => (
-              <tr key={idx} className="hover:bg-white/5 transition-colors">
-                <td className="p-3 font-bold text-white">{player.name}</td>
-                <td className="p-3 text-gray-400">{player.team}</td>
-                <td className="p-3 text-right font-black text-pitch-green">{player[metric]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-3 mb-6">
@@ -51,12 +23,12 @@ const PlayerStatsDisplay: React.FC<PlayerStatsDisplayProps> = ({ stats, entityNa
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {renderStatTable("Top Scorers", stats.topScorers, "⚽", "goals")}
-        {renderStatTable("Top Assisters", stats.topAssisters, "🎯", "assists")}
+        <SortableStatTable title="Top Scorers" data={stats.topScorers} icon="⚽" metric="goals" />
+        <SortableStatTable title="Top Assisters" data={stats.topAssisters} icon="🎯" metric="assists" />
       </div>
 
       <div className="max-w-2xl">
-        {renderStatTable("Most Appearances", stats.mostAppearances, "🏃", "appearances")}
+        <SortableStatTable title="Most Appearances" data={stats.mostAppearances} icon="🏃" metric="appearances" />
       </div>
     </div>
   );

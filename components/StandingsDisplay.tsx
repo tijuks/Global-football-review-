@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { LeagueStandings, StandingEntry } from '../types';
 import { TeamLogo } from './TeamLogo';
 
@@ -27,6 +27,55 @@ const StandingsDisplay: React.FC<StandingsDisplayProps> = ({ standings, leagueNa
     );
   };
 
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+
+  const sortedStandings = React.useMemo(() => {
+    if (!standings) return [];
+    let sortableItems = [...standings.standings];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        let aVal: any;
+        let bVal: any;
+
+        if (sortConfig.key === 'goalsDifference') {
+          aVal = a.goalsFor - a.goalsAgainst;
+          bVal = b.goalsFor - b.goalsAgainst;
+        } else {
+          aVal = a[sortConfig.key as keyof StandingEntry];
+          bVal = b[sortConfig.key as keyof StandingEntry];
+        }
+        
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          return sortConfig.direction === 'asc' 
+            ? aVal.localeCompare(bVal) 
+            : bVal.localeCompare(aVal);
+        }
+        
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return sortConfig.direction === 'asc' 
+            ? aVal - bVal 
+            : bVal - aVal;
+        }
+
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [standings?.standings, sortConfig]);
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'desc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'desc') {
+      direction = 'asc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIcon = (key: string) => {
+    if (!sortConfig || sortConfig.key !== key) return '↕️';
+    return sortConfig.direction === 'asc' ? '↑' : '↓';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -41,19 +90,21 @@ const StandingsDisplay: React.FC<StandingsDisplayProps> = ({ standings, leagueNa
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-white/5 text-[10px] font-black uppercase tracking-widest text-gray-500">
-                <th className="px-4 py-4 text-center w-12">#</th>
-                <th className="px-4 py-4">Team</th>
-                <th className="px-2 py-4 text-center">P</th>
-                <th className="px-2 py-4 text-center">W</th>
-                <th className="px-2 py-4 text-center">D</th>
-                <th className="px-2 py-4 text-center">L</th>
-                <th className="px-2 py-4 text-center hidden sm:table-cell">GD</th>
-                <th className="px-4 py-4 text-center font-black text-white">Pts</th>
+                <th className="px-4 py-4 text-center cursor-pointer" onClick={() => requestSort('rank')}># {getSortIcon('rank')}</th>
+                <th className="px-4 py-4 cursor-pointer" onClick={() => requestSort('team')}>Team {getSortIcon('team')}</th>
+                <th className="px-2 py-4 text-center cursor-pointer" onClick={() => requestSort('played')}>P {getSortIcon('played')}</th>
+                <th className="px-2 py-4 text-center cursor-pointer" onClick={() => requestSort('wins')}>W {getSortIcon('wins')}</th>
+                <th className="px-2 py-4 text-center cursor-pointer" onClick={() => requestSort('draws')}>D {getSortIcon('draws')}</th>
+                <th className="px-2 py-4 text-center cursor-pointer" onClick={() => requestSort('losses')}>L {getSortIcon('losses')}</th>
+                <th className="px-2 py-4 text-center cursor-pointer" onClick={() => requestSort('goalsFor')}>GF {getSortIcon('goalsFor')}</th>
+                <th className="px-2 py-4 text-center cursor-pointer" onClick={() => requestSort('goalsAgainst')}>GA {getSortIcon('goalsAgainst')}</th>
+                <th className="px-2 py-4 text-center cursor-pointer hidden sm:table-cell" onClick={() => requestSort('goalsDifference')}>GD {getSortIcon('goalsDifference')}</th>
+                <th className="px-4 py-4 text-center font-black text-white cursor-pointer" onClick={() => requestSort('points')}>Pts {getSortIcon('points')}</th>
                 <th className="px-4 py-4 hidden md:table-cell">Form</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {standings.standings.map((entry: StandingEntry) => (
+              {sortedStandings.map((entry: StandingEntry) => (
                 <tr key={entry.rank} className="hover:bg-white/5 transition-colors group">
                   <td className="px-4 py-4 text-center">
                     <span className={`text-xs font-black ${entry.rank <= 4 ? 'text-blue-400' : entry.rank >= 18 ? 'text-rose-500' : 'text-gray-500'}`}>
@@ -70,6 +121,8 @@ const StandingsDisplay: React.FC<StandingsDisplayProps> = ({ standings, leagueNa
                   <td className="px-2 py-4 text-center text-xs text-gray-400">{entry.wins}</td>
                   <td className="px-2 py-4 text-center text-xs text-gray-400">{entry.draws}</td>
                   <td className="px-2 py-4 text-center text-xs text-gray-400">{entry.losses}</td>
+                  <td className="px-2 py-4 text-center text-xs text-gray-400">{entry.goalsFor}</td>
+                  <td className="px-2 py-4 text-center text-xs text-gray-400">{entry.goalsAgainst}</td>
                   <td className="px-2 py-4 text-center text-xs text-gray-400 hidden sm:table-cell">
                     {entry.goalsFor - entry.goalsAgainst > 0 ? `+${entry.goalsFor - entry.goalsAgainst}` : entry.goalsFor - entry.goalsAgainst}
                   </td>

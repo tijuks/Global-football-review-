@@ -66,56 +66,6 @@ async function startServer() {
     }
   });
 
-  app.get("/api/auth/github", (_req, res) => {
-    const params = new URLSearchParams({
-      client_id: process.env.GITHUB_CLIENT_ID!,
-      redirect_uri: `${process.env.APP_URL}/auth/github/callback`,
-      scope: 'user:email',
-    });
-    res.json({ url: `https://github.com/login/oauth/authorize?${params}` });
-  });
-
-  app.get("/auth/github/callback", async (req, res) => {
-    const { code } = req.query;
-    if (!code) return res.status(400).send("No code provided");
-
-    try {
-      const response = await fetch("https://github.com/login/oauth/access_token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
-          code,
-        }),
-      });
-      await response.json();
-      
-      // Send success message to parent window and close popup
-      res.send(`
-        <html>
-          <body>
-            <script>
-              if (window.opener) {
-                window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
-                window.close();
-              } else {
-                window.location.href = '/';
-              }
-            </script>
-            <p>Authentication successful. This window should close automatically.</p>
-          </body>
-        </html>
-      `);
-    } catch (error) {
-      console.error("GitHub OAuth error:", error);
-      res.status(500).send("Authentication failed");
-    }
-  });
-
   // Socket.io logic
   const messages: any[] = [];
   const users = new Map();

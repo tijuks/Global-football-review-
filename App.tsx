@@ -145,7 +145,6 @@ const App: React.FC = () => {
       <div className="flex flex-col h-screen bg-gradient-to-br from-chocolate-dark via-chocolate to-pitch-green-dark relative overflow-hidden">
         <Header 
           onSearchPlayer={handlePlayerSearch} 
-          onOpenSettings={() => setIsShowingApiKeyModal(true)} 
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
         <div className="flex flex-1 overflow-hidden">

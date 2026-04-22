@@ -1,17 +1,14 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PlayerSearch from './PlayerSearch';
-import SpeedMonitor from './SpeedMonitor';
 import { SoundButton } from './SoundButton';
 
 interface HeaderProps {
   onSearchPlayer: (name: string) => void;
-  onOpenSettings: () => void;
   onToggleSidebar: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onSearchPlayer, onOpenSettings, onToggleSidebar }) => {
+const Header: React.FC<HeaderProps> = ({ onSearchPlayer, onToggleSidebar }) => {
   const { t, i18n } = useTranslation();
 
   const changeLanguage = (lng: string) => {
@@ -36,7 +33,6 @@ const Header: React.FC<HeaderProps> = ({ onSearchPlayer, onOpenSettings, onToggl
                <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
                  {t('app_title')}
                </h1>
-               <SpeedMonitor />
              </div>
           </div>
           
@@ -47,29 +43,6 @@ const Header: React.FC<HeaderProps> = ({ onSearchPlayer, onOpenSettings, onToggl
 
           {/* Actions & Language Switcher */}
           <div className="flex items-center gap-3 shrink-0 order-2 sm:order-3">
-             <SoundButton 
-               onClick={onOpenSettings}
-               className="p-2 bg-black/20 rounded-full border border-white/10 text-white/80 hover:text-white hover:bg-white/30 transition-all"
-               title="API Settings"
-             >
-               ⚙️
-             </SoundButton>
-             <SoundButton
-               onClick={async () => {
-                 const res = await fetch('/api/auth/github');
-                 const { url } = await res.json();
-                 const authWindow = window.open(url, 'github_oauth', 'width=600,height=700');
-                 window.addEventListener('message', (event) => {
-                   if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-                     alert('Logged in with GitHub!');
-                     authWindow?.close();
-                   }
-                 }, { once: true });
-               }}
-               className="px-3 py-1.5 bg-black/20 rounded-full border border-white/10 text-white/80 hover:text-white hover:bg-white/30 transition-all text-[10px] font-bold uppercase"
-             >
-               Login with GitHub
-             </SoundButton>
              <div className="flex bg-black/20 rounded-full p-0.5 border border-white/10 overflow-hidden">
                 {['en', 'es', 'fr'].map((lng: string) => (
                   <SoundButton

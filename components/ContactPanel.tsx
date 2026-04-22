@@ -158,7 +158,7 @@ const ContactPanel: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        <div className="p-8 bg-black/20 border-t border-white/5 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-8 bg-black/20 border-t border-white/5 grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="flex items-center gap-3">
             <div className="text-pitch-green-light"><MessageSquare size={18} /></div>
             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">24/7 Support</div>
@@ -170,6 +170,10 @@ const ContactPanel: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="text-pitch-green-light"><CheckCircle2 size={18} /></div>
             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Verified Hub</div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-pitch-green-light">📧</div>
+            <a href="mailto:gmach037@gmail.com" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-white transition-colors">gmach037@gmail.com</a>
           </div>
         </div>
       </motion.div>

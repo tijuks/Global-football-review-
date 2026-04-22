@@ -21,7 +21,7 @@ const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, ent
   const [playerImageUrl, setPlayerImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'career'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'career' | 'biography'>('overview');
   
   // AI Image State
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -37,6 +37,21 @@ const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, ent
           geminiService.fetchPlayerProfile(playerName, entity.name),
           geminiService.fetchPlayerImage(playerName)
         ]);
+        
+        // Add hypothetical achievement to the most recent club
+        if (profileData.careerHistory && profileData.careerHistory.length > 0) {
+            const updatedCareerHistory = [...profileData.careerHistory];
+            const mostRecentClub = updatedCareerHistory[0];
+            const newAchievement = "Key contribution to the 2025 Cup Final victory";
+            if (!mostRecentClub.achievements) {
+                mostRecentClub.achievements = [];
+            }
+            if (!mostRecentClub.achievements.includes(newAchievement)) {
+                mostRecentClub.achievements.push(newAchievement);
+            }
+            profileData.careerHistory = updatedCareerHistory;
+        }
+
         setProfile(profileData);
         setPlayerImageUrl(imageUrl);
       } catch (err) {
@@ -208,6 +223,12 @@ const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, ent
                 >
                   Career History
                 </button>
+                <button 
+                  onClick={() => setActiveTab('biography')}
+                  className={`pb-2 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'biography' ? 'text-pitch-green-light border-b-2 border-pitch-green' : 'text-gray-500 hover:text-gray-300'}`}
+                >
+                  Biography
+                </button>
               </div>
 
               {activeTab === 'overview' ? (
@@ -223,6 +244,16 @@ const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, ent
                         ))}
                       </div>
                     </section>
+                    <section>
+                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        ⚠️ {t('player.key_weaknesses')}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.weaknesses.map((weakness, index) => (
+                          <span key={index} className="bg-red-900/20 text-red-400 text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border border-red-900/20">{weakness}</span>
+                        ))}
+                      </div>
+                    </section>
                   </div>
 
                   <section>
@@ -234,7 +265,7 @@ const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, ent
                     </div>
                   </section>
                 </div>
-              ) : (
+              ) : activeTab === 'career' ? (
                 <div className="space-y-4">
                   {profile.careerHistory && profile.careerHistory.length > 0 ? (
                     <div className="space-y-4">
@@ -280,6 +311,15 @@ const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ playerName, ent
                       <p className="text-gray-500 text-xs italic">No detailed career history available for this player.</p>
                     </div>
                   )}
+                </div>
+              ) : (
+                <div className="space-y-4 text-gray-300 leading-relaxed text-sm">
+                  <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    📖 Biography
+                  </h3>
+                  <div className="bg-gray-900/40 p-5 rounded-2xl border border-white/5">
+                    {profile.biography}
+                  </div>
                 </div>
               )}
 

@@ -4,9 +4,10 @@ import * as geminiService from '../services/geminiService';
 import { ImageSize, ImageAspectRatio, VideoAspectRatio } from '../types';
 import Markdown from 'react-markdown';
 import LiveAssistant from './LiveAssistant';
+import { ObjectDetector } from './ObjectDetector';
 
 const AILab: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'analyze' | 'generate' | 'transcribe' | 'search' | 'live'>('analyze');
+  const [activeTab, setActiveTab] = useState<'analyze' | 'generate' | 'transcribe' | 'search' | 'live' | 'detect'>('analyze');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -137,7 +138,8 @@ const AILab: React.FC = () => {
           { id: 'generate', icon: '🎨', label: 'Create' },
           { id: 'live', icon: '🎙️', label: 'Live' },
           { id: 'transcribe', icon: '🎤', label: 'Voice' },
-          { id: 'search', icon: '🌐', label: 'Grounding' }
+          { id: 'search', icon: '🌐', label: 'Grounding' },
+          { id: 'detect', icon: '👁️', label: 'Detect' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -437,6 +439,16 @@ const AILab: React.FC = () => {
                     "Grounding ensures that Gemini uses the most recent information from the web to verify facts and provide up-to-date answers."
                   </p>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'detect' && (
+              <div className="space-y-6">
+                <div className="text-center space-y-2">
+                  <h2 className="text-xl font-black text-white uppercase tracking-tight">Real-time Detection</h2>
+                  <p className="text-gray-500 text-xs">Detect objects in real-time using TensorFlow.js.</p>
+                </div>
+                <ObjectDetector />
               </div>
             )}
           </div>

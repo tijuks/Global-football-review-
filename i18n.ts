@@ -41,6 +41,7 @@ const resources = {
       "head_to_head": "Head-to-Head Comparison",
       "player": {
         "key_strengths": "Key Strengths",
+        "key_weaknesses": "Key Weaknesses",
         "recent_performance": "Recent Performance",
         "queued": "Queued",
         "compare": "Compare",
@@ -109,6 +110,7 @@ const resources = {
       "head_to_head": "Comparación Directa",
       "player": {
         "key_strengths": "Fortalezas Clave",
+        "key_weaknesses": "Debilidades Clave",
         "recent_performance": "Rendimiento Reciente",
         "queued": "En cola",
         "compare": "Comparar",
@@ -177,6 +179,7 @@ const resources = {
       "head_to_head": "Comparaison Directe",
       "player": {
         "key_strengths": "Forces Clés",
+        "key_weaknesses": "Faiblesses Clés",
         "recent_performance": "Performance Récente",
         "queued": "En attente",
         "compare": "Comparer",

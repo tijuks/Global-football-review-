@@ -22,9 +22,10 @@ export const getTeamLogoUrl = (teamName: string): string => {
 interface TeamLogoProps {
   teamName: string;
   className?: string;
+  fallback?: React.ReactNode;
 }
 
-export const TeamLogo: React.FC<TeamLogoProps> = ({ teamName, className }) => {
+export const TeamLogo: React.FC<TeamLogoProps> = ({ teamName, className, fallback }) => {
   const [error, setError] = useState(false);
   const [customLogo, setCustomLogo] = useState<string | null>(null);
   
@@ -49,6 +50,10 @@ export const TeamLogo: React.FC<TeamLogoProps> = ({ teamName, className }) => {
   const cleanName = teamName.replace(/[^a-zA-Z0-9\s]/g, '').trim();
   const initials = (cleanName || 'FC').split(/\s+/).filter(Boolean).map(n => [...n][0]).join('').substring(0, 2).toUpperCase();
   const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials || 'FC')}&background=random&color=fff&size=128&bold=true`;
+
+  if (error && fallback) {
+    return <div className={className}>{fallback}</div>;
+  }
 
   return (
     <img 
